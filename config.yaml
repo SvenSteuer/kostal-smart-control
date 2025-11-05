@@ -189,8 +189,6 @@ schema:
   enable_consumption_learning: bool
   learning_period_days: int(7,90)
   home_consumption_sensor: str?
-  manual_load_profile:
-    match(^\d+$): float?
   average_daily_consumption: float?
   default_hourly_consumption_fallback: float?
 
