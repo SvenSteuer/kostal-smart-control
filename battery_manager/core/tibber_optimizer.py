@@ -31,6 +31,36 @@ class TibberOptimizer:
         self.forecast_solar_api = api
         logger.info("Forecast.Solar API integrated into optimizer")
 
+    def _build_planes_from_config(self, config: Dict) -> list:
+        """
+        Build planes list from individual config fields (v0.9.3)
+
+        Args:
+            config: Configuration dict with plane1/plane2 fields
+
+        Returns:
+            list: List of plane dicts [{declination, azimuth, kwp}, ...]
+        """
+        planes = []
+
+        # Check for up to 2 planes (can be extended to support more)
+        for i in range(1, 3):
+            declination = config.get(f'forecast_solar_plane{i}_declination')
+            azimuth = config.get(f'forecast_solar_plane{i}_azimuth')
+            kwp = config.get(f'forecast_solar_plane{i}_kwp')
+
+            # Only add plane if all three values are configured
+            if declination is not None and azimuth is not None and kwp is not None:
+                plane = {
+                    'declination': declination,
+                    'azimuth': azimuth,
+                    'kwp': kwp
+                }
+                planes.append(plane)
+                logger.debug(f"Added plane {i}: {plane}")
+
+        return planes
+
     def get_hourly_pv_forecast(self, ha_client, config) -> Dict[int, float]:
         """
         Get hourly PV forecast (v0.9.2: now supports Forecast.Solar API)
@@ -46,13 +76,14 @@ class TibberOptimizer:
         Returns:
             dict: {hour: kwh_forecast} for each hour of the day
         """
-        # v0.9.2 - Try Forecast.Solar API first if enabled
+        # v0.9.3 - Try Forecast.Solar API first if enabled
         if (self.forecast_solar_api and
             config.get('enable_forecast_solar_api', False)):
 
             logger.debug("Using Forecast.Solar Professional API for PV forecast")
 
-            planes = config.get('forecast_solar_planes', [])
+            # Build planes list from individual config fields (v0.9.3)
+            planes = self._build_planes_from_config(config)
             if planes:
                 try:
                     hourly_forecast = self.forecast_solar_api.get_hourly_forecast(planes)
