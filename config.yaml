@@ -168,6 +168,16 @@ schema:
   pv_next_hour_roof1: str?
   pv_next_hour_roof2: str?
 
+  # v0.9.2 - Forecast.Solar Professional API
+  enable_forecast_solar_api: bool
+  forecast_solar_api_key: str?
+  forecast_solar_latitude: float?
+  forecast_solar_longitude: float?
+  forecast_solar_planes:
+    - declination: int(0,90)
+      azimuth: int(-180,180)
+      kwp: float(0.1,100.0)
+
   # v0.3.0 - Tibber Smart Charging
   tibber_price_threshold_1h: int(1,50)
   tibber_price_threshold_3h: int(1,50)
@@ -177,6 +187,8 @@ schema:
   enable_consumption_learning: bool
   learning_period_days: int(7,90)
   home_consumption_sensor: str?
+  manual_load_profile:
+    match(^\d+$): float?
   average_daily_consumption: float?
   default_hourly_consumption_fallback: float?
 
